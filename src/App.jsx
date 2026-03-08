@@ -46,7 +46,7 @@ function App() {
       <div>
         <div className="max-w-6xl mx-auto mb-8 text-center">
           <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900 mb-2">
-            Dashboard Instrumentasi Medis
+            Instrumentasi Medis
           </h1>
           <p className="text-gray-500 font-medium text-sm md:text-base">
             Analisis Instrumen Pemantau Detak Jantung Menggunakan Sensor MAX30100 dan AD8232 berbasis ESP32 dengan Antarmuka Website
