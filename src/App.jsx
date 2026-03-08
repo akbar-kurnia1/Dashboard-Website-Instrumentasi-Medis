@@ -49,7 +49,7 @@ function App() {
             Dashboard Instrumentasi Medis
           </h1>
           <p className="text-gray-500 font-medium text-sm md:text-base">
-            Pemantauan Detak Jantung (MAX30100) & EKG (AD8232) Berbasis ESP32
+            Analisis Instrumen Pemantau Detak Jantung Menggunakan Sensor MAX30100 dan AD8232 berbasis ESP32 dengan Antarmuka Website
           </p>
         </div>
 
