@@ -13,14 +13,29 @@ import ToggleButton from './components/ToggleButton.jsx';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler);
 
 function App() {
-
-  const [isSimModeBtn, setIsSimModeBtn] = useState(false); // default, false = mode sensor, true = mode simulasi
+  const [isSimModeBtn, setIsSimModeBtn] = useState(false);
   const simData = useSimulationData(isSimModeBtn);      
   const mqttData = useMQTTData(!isSimModeBtn);          
 
   const bpm = isSimModeBtn ? simData.bpm : mqttData.bpm;
   const spo2 = isSimModeBtn ? simData.spo2 : mqttData.spo2;
   const dataEKG = isSimModeBtn ? simData.dataEKG : mqttData.dataEKG;
+
+  const getBpmColor = (value) => {
+    if (value === '--') return 'text-gray-300';
+    const num = parseInt(value);
+    if (num < 60) return 'text-blue-500';
+    if (num <= 100) return 'text-green-500';
+    return 'text-red-500';
+  };
+
+  const getSpo2Color = (value) => {
+    if (value === '--') return 'text-gray-300';
+    const num = parseInt(value);
+    if (num >= 90) return 'text-green-500';
+    if (num >= 70) return 'text-orange-500';
+    return 'text-red-500';
+  };
 
   const chartData = {
     labels: Array(100).fill(''),
@@ -46,24 +61,54 @@ function App() {
       <div>
         <div className="max-w-6xl mx-auto mb-8 text-center">
           <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900 mb-2">
-            Instrumentasi Medis
+            Analisis Instrumen Pemantau Detak Jantung
           </h1>
           <p className="text-gray-500 font-medium text-sm md:text-base">
-            Analisis Instrumen Pemantau Detak Jantung Menggunakan Sensor MAX30100 dan AD8232 berbasis ESP32 dengan Antarmuka Website
+            Menggunakan Sensor MAX30100 dan AD8232 berbasis ESP32 dengan Antarmuka Website
           </p>
         </div>
 
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center">
+          
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center relative">
             <h2 className="text-gray-500 text-lg font-semibold mb-2">Detak Jantung (BPM)</h2>
-            <div className="text-6xl font-bold text-red-500">{bpm}</div>
-            <p className="text-sm text-gray-400 mt-3">{bpm !== '--' ? 'Menerima data...' : 'Menunggu data sensor...'}</p>
+            <div className={`text-6xl font-bold transition-colors duration-500 ${getBpmColor(bpm)}`}>
+              {bpm}
+            </div>
+            <p className="text-sm text-gray-400 mt-3 mb-4">{bpm !== '--' ? 'Menerima data...' : 'Menunggu data sensor...'}</p>
+            <div className="w-full pt-4 border-t border-gray-100 text-xs text-gray-500 flex flex-col gap-1">
+              <div className="flex items-center justify-center gap-4">
+                <div title="Rendah: Detak jantung di bawah normal (Bradikardia)" className="flex items-center gap-1 hover:text-gray-700">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-400"></span> &lt; 60
+                </div>
+                <div title="Normal: Detak jantung sehat dan optimal" className="flex items-center gap-1 hover:text-gray-700">
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span> 60 - 100
+                </div>
+                <div title="Tinggi: Detak jantung di atas normal (Takikardia)" className="flex items-center gap-1 hover:text-gray-700">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span> &gt; 100
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center relative">
             <h2 className="text-gray-500 text-lg font-semibold mb-2">Saturasi Oksigen (SpO2)</h2>
-            <div className="text-6xl font-bold text-blue-500">{spo2}<span className="text-4xl">%</span></div>
-            <p className="text-sm text-gray-400 mt-3">{spo2 !== '--' ? 'Menerima data...' : 'Menunggu data sensor...'}</p>
+            <div className={`text-6xl font-bold transition-colors duration-500 ${getSpo2Color(spo2)}`}>
+              {spo2}<span className="text-4xl">%</span>
+            </div>
+            <p className="text-sm text-gray-400 mt-3 mb-4">{spo2 !== '--' ? 'Menerima data...' : 'Menunggu data sensor...'}</p>
+            <div className="w-full pt-4 border-t border-gray-100 text-xs text-gray-500 flex flex-col gap-1">
+              <div className="flex items-center justify-center gap-4">
+                <div title="Normal: Kadar oksigen dalam darah sangat baik" className="flex items-center gap-1 hover:text-gray-700">
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span> &ge; 90%
+                </div>
+                <div title="Waspada: Kadar oksigen rendah (Hipoksia ringan-sedang)" className="flex items-center gap-1 hover:text-gray-700">
+                  <span className="w-2.5 h-2.5 rounded-full bg-orange-400"></span> 70% - 89%
+                </div>
+                <div title="Bahaya: Kadar oksigen sangat rendah (Hipoksia berat)" className="flex items-center gap-1 hover:text-gray-700">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span> &lt; 70%
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:col-span-2">
