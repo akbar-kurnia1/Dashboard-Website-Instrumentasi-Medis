@@ -1,16 +1,19 @@
-# React + Vite
+## Analisis Instrumen Pemantau Detak Jantung Menggunakan Sensor MAX30100 dan AD8232 berbasis ESP32 dengan Antarmuka Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+*Mata Kuliah: Instrumentasi Medis, Jurusan Fisika, Fakultas MIPA, Universitas Sriwijaya*
 
-Currently, two official plugins are available:
+### 1. Antarmuka Dashboard Web
+<img width="702" height="438" alt="Screenshot 2026-03-10 084535" src="https://github.com/user-attachments/assets/9a461d28-6463-4071-96e2-e873b2b003cf" />
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 2. Desain Rangkaian (Fritzing)
+<img width="2189" height="1329" alt="Kelompok 1 Instrumen medis_bb" src="https://github.com/user-attachments/assets/b5d2e52d-8401-473f-b8f9-f261af40ee22" />
 
-## React Compiler
+### 3. Simulasi (Wokwi)
+<img width="695" height="442" alt="Screenshot 2026-03-08 212447" src="https://github.com/user-attachments/assets/dee2098f-9e0b-4393-9c49-da596175340f" />
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+### 4. Flowchart Sistem
+![Presentation1](https://github.com/user-attachments/assets/ca38d476-631f-4603-96fa-351155959a3a)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 5. Foto Alat Fisik
+![Foto Alat Final](URL-FOTO-ALAT)
