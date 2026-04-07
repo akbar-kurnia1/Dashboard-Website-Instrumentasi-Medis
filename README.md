@@ -11,9 +11,20 @@
 ### 3. Simulasi (Wokwi)
 <img width="800" height="442" alt="Screenshot 2026-03-08 212447" src="https://github.com/user-attachments/assets/dee2098f-9e0b-4393-9c49-da596175340f" />
 
-
 ### 4. Flowchart Sistem
 <img src="https://github.com/user-attachments/assets/ca38d476-631f-4603-96fa-351155959a3a" width="800" alt="Presentation1">
 
-### 5. Foto Alat (_On Progress_)
+### 5. Prototipe Alat
+<img src="https://github.com/user-attachments/assets/f2972f7d-07d3-414b-8137-63678ec81ffc" width="800" alt="Presentation1">
+
+### 6. BPM dan SpO2 Test (LCD)
+<img src="https://github.com/user-attachments/assets/a4765412-427a-4de1-93d8-73ec3df59cd8" width="800" alt="Presentation1">
+
+### 7. BPM dan SpO2 Test (Web)
+<img src="https://github.com/user-attachments/assets/a96ed95f-ee67-4c7c-bb56-1abe908893e8" width="800" alt="Presentation1">
+
+### 8. EKG Test (_On Progress_)
+![Foto Alat](URL-FOTO-ALAT)
+
+### 9. Foto Alat (_On Progress_)
 ![Foto Alat](URL-FOTO-ALAT)
