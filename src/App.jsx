@@ -1,16 +1,9 @@
-import React, { useState } from 'react';
-import {
-  Chart as ChartJS, CategoryScale, LinearScale, PointElement,
-  LineElement, Title, Tooltip, Filler
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import React, { useState, useEffect } from 'react';
 import { useSimulationData } from './hooks/useSimulationData';
 import { useMQTTData } from './hooks/useMQTTData';
 
 import Footer from './components/Footer.jsx';
 import ToggleButton from './components/ToggleButton.jsx';
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler);
 
 function App() {
   const [isSimModeBtn, setIsSimModeBtn] = useState(false);
@@ -19,7 +12,24 @@ function App() {
 
   const bpm = isSimModeBtn ? simData.bpm : mqttData.bpm;
   const spo2 = isSimModeBtn ? simData.spo2 : mqttData.spo2;
-  const dataEKG = isSimModeBtn ? simData.dataEKG : mqttData.dataEKG;
+
+  // STATE BARU: Untuk menyimpan riwayat log data
+  const [history, setHistory] = useState([]);
+
+  // EFFECT BARU: Menangkap data masuk dan menyimpannya ke history dengan timestamp
+  useEffect(() => {
+    // Hanya simpan data jika bukan "--" (sedang loading) dan bukan 0
+    if (bpm !== '--' && bpm !== 0 && spo2 !== '--' && spo2 !== 0) {
+      const newEntry = {
+        waktu: new Date().toLocaleTimeString('id-ID'), // Format jam:menit:detik
+        nilaiBpm: bpm,
+        nilaiSpo2: spo2
+      };
+
+      // Tambahkan ke posisi paling atas, batasi maksimal 15 baris data agar tabel tidak kepanjangan
+      setHistory(prev => [newEntry, ...prev].slice(0, 15));
+    }
+  }, [bpm, spo2]);
 
   const getBpmColor = (value) => {
     if (value === '--') return 'text-gray-300';
@@ -37,24 +47,6 @@ function App() {
     return 'text-red-500';
   };
 
-  const chartData = {
-    labels: Array(100).fill(''),
-    datasets: [{
-      label: 'Sinyal EKG (mV)',
-      data: dataEKG,
-      borderColor: isSimModeBtn ? 'rgb(34, 197, 94)' : 'rgb(59, 130, 246)', 
-      borderWidth: 2.5,
-      pointRadius: 0,
-      tension: 0.2,
-    }],
-  };
-
-  const chartOptions = {
-    responsive: true, maintainAspectRatio: false, animation: false,
-    scales: { y: { min: 0, max: 2000, display: false }, x: { display: false } },
-    plugins: { legend: { display: false } }
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans flex flex-col justify-between relative pb-16">
       
@@ -64,12 +56,13 @@ function App() {
             Analisis Instrumen Pemantau Detak Jantung
           </h1>
           <p className="text-gray-500 font-medium text-sm md:text-base">
-            Menggunakan Sensor MAX30100 dan AD8232 berbasis ESP32 dengan Antarmuka Website
+            Menggunakan Sensor MAX30102 Berbasis ESP32 dengan Antarmuka Website
           </p>
         </div>
 
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           
+          {/* Card BPM */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center relative">
             <h2 className="text-gray-500 text-lg font-semibold mb-2">Detak Jantung (BPM)</h2>
             <div className={`text-6xl font-bold transition-colors duration-500 ${getBpmColor(bpm)}`}>
@@ -78,18 +71,20 @@ function App() {
             <p className="text-sm text-gray-400 mt-3 mb-4">{bpm !== '--' ? 'Menerima data...' : 'Menunggu data sensor...'}</p>
             <div className="w-full pt-4 border-t border-gray-100 text-xs text-gray-500 flex flex-col gap-1">
               <div className="flex items-center justify-center gap-4">
-                <div title="Rendah: Detak jantung di bawah normal (Bradikardia)" className="flex items-center gap-1 hover:text-gray-700">
+                <div title="Rendah: Detak jantung di bawah normal" className="flex items-center gap-1 hover:text-gray-700">
                   <span className="w-2.5 h-2.5 rounded-full bg-blue-400"></span> &lt; 60
                 </div>
                 <div title="Normal: Detak jantung sehat dan optimal" className="flex items-center gap-1 hover:text-gray-700">
                   <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span> 60 - 100
                 </div>
-                <div title="Tinggi: Detak jantung di atas normal (Takikardia)" className="flex items-center gap-1 hover:text-gray-700">
+                <div title="Tinggi: Detak jantung di atas normal" className="flex items-center gap-1 hover:text-gray-700">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span> &gt; 100
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Card SpO2 */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center justify-center relative">
             <h2 className="text-gray-500 text-lg font-semibold mb-2">Saturasi Oksigen (SpO2)</h2>
             <div className={`text-6xl font-bold transition-colors duration-500 ${getSpo2Color(spo2)}`}>
@@ -98,30 +93,72 @@ function App() {
             <p className="text-sm text-gray-400 mt-3 mb-4">{spo2 !== '--' ? 'Menerima data...' : 'Menunggu data sensor...'}</p>
             <div className="w-full pt-4 border-t border-gray-100 text-xs text-gray-500 flex flex-col gap-1">
               <div className="flex items-center justify-center gap-4">
-                <div title="Normal: Kadar oksigen dalam darah sangat baik" className="flex items-center gap-1 hover:text-gray-700">
+                <div title="Normal: Kadar oksigen sangat baik" className="flex items-center gap-1 hover:text-gray-700">
                   <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span> &ge; 90%
                 </div>
-                <div title="Waspada: Kadar oksigen rendah (Hipoksia ringan-sedang)" className="flex items-center gap-1 hover:text-gray-700">
+                <div title="Waspada: Kadar oksigen rendah" className="flex items-center gap-1 hover:text-gray-700">
                   <span className="w-2.5 h-2.5 rounded-full bg-orange-400"></span> 70% - 89%
                 </div>
-                <div title="Bahaya: Kadar oksigen sangat rendah (Hipoksia berat)" className="flex items-center gap-1 hover:text-gray-700">
+                <div title="Bahaya: Kadar oksigen sangat rendah" className="flex items-center gap-1 hover:text-gray-700">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span> &lt; 70%
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Komponen Log Riwayat Pengganti Grafik EKG */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:col-span-2">
-            <h2 className="text-gray-500 text-lg font-semibold mb-4 text-center">
-              Grafik Gelombang Elektrokardiografi (EKG)
-            </h2>
-            <div className="w-full h-72 bg-black rounded-xl p-4 overflow-hidden shadow-inner relative">
-              <div className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold text-white ${isSimModeBtn ? 'bg-green-500/50' : 'bg-blue-500/50'}`}>
-                {isSimModeBtn ? 'SIMULASI' : 'SENSOR'}
+            <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
+              <h2 className="text-gray-500 text-lg font-semibold">
+                Log Riwayat Pembacaan Sensor
+              </h2>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-400">STATUS:</span>
+                <span className={`px-2 py-1 rounded text-xs font-bold text-white ${isSimModeBtn ? 'bg-orange-400' : 'bg-emerald-500'}`}>
+                  {isSimModeBtn ? 'MODE SIMULASI' : 'LIVE SENSOR'}
+                </span>
+                {!isSimModeBtn && bpm !== '--' && (
+                  <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse ml-1"></span>
+                )}
               </div>
-              <Line data={chartData} options={chartOptions} />
+            </div>
+
+            <div className="w-full bg-slate-50 rounded-xl overflow-hidden shadow-inner border border-gray-200">
+              <div className="max-h-72 overflow-y-auto">
+                <table className="w-full text-left text-sm border-collapse">
+                  <thead className="bg-slate-200 sticky top-0 z-10">
+                    <tr className="text-slate-600">
+                      <th className="py-3 px-4 font-bold border-b border-slate-300">Waktu (Timestamp)</th>
+                      <th className="py-3 px-4 font-bold border-b border-slate-300 text-center">Detak Jantung (BPM)</th>
+                      <th className="py-3 px-4 font-bold border-b border-slate-300 text-center">Saturasi (SpO2)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {history.length > 0 ? (
+                      history.map((item, index) => (
+                        <tr key={index} className="hover:bg-blue-50 transition-colors duration-150 bg-white">
+                          <td className="py-3 px-4 text-gray-500 font-mono text-sm">{item.waktu}</td>
+                          <td className="py-3 px-4 text-center">
+                            <span className={`font-bold ${getBpmColor(item.nilaiBpm)}`}>{item.nilaiBpm}</span>
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <span className={`font-bold ${getSpo2Color(item.nilaiSpo2)}`}>{item.nilaiSpo2}%</span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="3" className="py-12 text-center text-gray-400 italic">
+                          Belum ada data masuk. Tempelkan jari pada sensor...
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
 
